@@ -100,19 +100,10 @@
     <framework src="SystemConfiguration.framework" weak="true" />
     <framework src="libz.tbd" weak="true" />
     <framework src="libz.dylib" weak="true" />
+    <framework src="GoogleSignIn" type="podspec" spec="~> 4.4.0" />
+    <framework src="GoogleUtilities" type="podspec" spec="~> 6.3.0" />
 
-    <!-- Google frameworks -->
-    <podspec>
-      <config>
-        <source url="https://github.com/CocoaPods/Specs.git"/>
-      </config>
-      <pods use-frameworks="true">
-        <pod name="GoogleSignIn" spec="~> 4.4.0"/>
-        <pod name="GoogleUtilities" spec="~> 6.3.0"/>
-      </pods>
-    </podspec>
-
-		<hook type="after_plugin_install" src="hooks/ios/prerequisites.js"/>
+    <hook type="after_plugin_install" src="hooks/ios/prerequisites.js"/>
   </platform>
 
   <!-- browser -->
