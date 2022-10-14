@@ -1,5 +1,9 @@
 # Google Sign-In Cordova/PhoneGap Plugin
 
+## ⚠️⚠️⚠️ About this fork ⚠️⚠️⚠️
+
+This fork softens some breaking changes introduced in [this PR](https://github.com/EddyVerbruggen/cordova-plugin-googleplus/pull/764). When the mentioned PR is reviewed and finally merged (or when an alternative solution is developed), consider migrating back to the [original plugin by Eddy Verbruggen](https://github.com/EddyVerbruggen/cordova-plugin-googleplus).
+
 [![NPM version][npm-image]][npm-url]
 [![Downloads][downloads-image]][npm-url]
 [![Twitter Follow][twitter-image]][twitter-url]
