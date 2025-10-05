@@ -77,8 +77,15 @@ Ensure you have added your url address (example: `http://localhost:3000`) to **A
 See [this screenshot for example](http://pix.toile-libre.org/upload/original/1508064473.png)
 
 ### iOS
-This plugin has minimal support version for GoogleSingIn pod package 7.1.0, since that time you have to provide two additional variables 'REVERSED_CLIENT_ID' AND 'CLIENT_ID'.
+This plugin has minimal support version for GoogleSingIn pod package 7.1.0, since that time you have to provide two additional variables 'REVERSED_CLIENT_ID' AND 'GIDClientID'.
 Both you could find in google play console.
+
+To add `GIDClientID` add configuration edition to main `config.xml` file:
+```
+<edit-config file="*-Info.plist" mode="merge" target="GIDClientID">
+  <string>yourclientid</string>
+</edit-config>
+```
 The `REVERSED_CLIENT_ID` is also known as the "iOS URL Scheme" on the Developer's Console.
 
 Login on iOS takes the user to a [SafariViewController](https://developer.apple.com/library/ios/documentation/SafariServices/Reference/SFSafariViewController_Ref/) through the Google SDK, instead of the separate Safari browser.

@@ -82,9 +82,6 @@
         </dict>
       </array>
     </config-file>
-    <edit-config file="*-Info.plist" mode="merge" target="GIDClientID">
-      <string>$CLIENT_ID</string>
-    </edit-config>
 
     <config-file parent="keychain-access-groups" target="*/Entitlements-Debug.plist">
       <array>
