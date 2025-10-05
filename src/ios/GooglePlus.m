@@ -26,10 +26,10 @@
 
     if ([possibleReversedClientId isEqualToString:self.getreversedClientId] && self.isSigningIn) {
         self.isSigningIn = NO;
+        // В GoogleSignIn 9.0.0 метод handleURL возвращает BOOL
         [GIDSignIn.sharedInstance handleURL:url];
     }
 }
-
 
 - (void) login:(CDVInvokedUrlCommand*)command {
     _callbackId = command.callbackId;
@@ -56,31 +56,56 @@
     }
 
     GIDSignIn *signIn = GIDSignIn.sharedInstance;
+    self.isSigningIn = YES;
 
-    [signIn signInWithConfiguration:config presentingViewController:self.viewController callback:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
+    // В GoogleSignIn 9.0.0 изменилась сигнатура метода signIn
+    // Теперь используется signInWithPresentingViewController:completion:
+    [signIn signInWithPresentingViewController:self.viewController
+                                    completion:^(GIDSignInResult * _Nullable result, NSError * _Nullable error) {
         if (error) {
             CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.localizedDescription];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self->_callbackId];
         } else {
+            GIDGoogleUser *user = result.user;
             NSString *email = user.profile.email;
             NSString *userId = user.userID;
-            NSURL *imageUrl = [user.profile imageURLWithDimension:120]; // TODO pass in img size as param, and try to sync with Android
-            NSDictionary *result = @{
-                           @"email"           : email,
-                           @"userId"          : userId,
-                           @"idToken"         : user.authentication.idToken,
-                           @"displayName"     : user.profile.name       ? : [NSNull null],
-                           @"givenName"       : user.profile.givenName  ? : [NSNull null],
-                           @"familyName"      : user.profile.familyName ? : [NSNull null],
-                           @"imageUrl"        : imageUrl ? imageUrl.absoluteString : [NSNull null],
-                           };
+            NSURL *imageUrl = [user.profile imageURLWithDimension:120];
 
-            CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+            // В GoogleSignIn 9.0.0 структура токенов изменилась
+            // idToken теперь находится в user.idToken.tokenString
+            NSString *idToken = user.idToken.tokenString;
+
+            // serverAuthCode теперь находится в result.serverAuthCode (не в user)
+            NSString *serverAuthCode = result.serverAuthCode;
+
+            NSMutableDictionary *res = [@{
+                @"email"       : email ?: [NSNull null],
+                @"userId"      : userId ?: [NSNull null],
+                @"idToken"     : idToken ?: [NSNull null],
+                @"displayName" : user.profile.name       ?: [NSNull null],
+                @"givenName"   : user.profile.givenName  ?: [NSNull null],
+                @"familyName"  : user.profile.familyName ?: [NSNull null],
+                @"imageUrl"    : imageUrl ? imageUrl.absoluteString : [NSNull null],
+            } mutableCopy];
+
+            // Добавляем serverAuthCode если он есть (для offline режима)
+            if (serverAuthCode != nil) {
+                res[@"serverAuthCode"] = serverAuthCode;
+            }
+
+            // Добавляем accessToken если нужен
+            if (user.accessToken != nil && user.accessToken.tokenString != nil) {
+                res[@"accessToken"] = user.accessToken.tokenString;
+            }
+
+            CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:res];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self->_callbackId];
         }
     }];
-}
 
+    // Важно: Конфигурация должна быть установлена перед вызовом signIn
+    signIn.configuration = config;
+}
 
 - (NSString*) reverseUrlScheme:(NSString*)scheme {
     NSArray* originalArray = [scheme componentsSeparatedByString:@"."];
@@ -113,7 +138,8 @@
 }
 
 - (void) disconnect:(CDVInvokedUrlCommand*)command {
-    [GIDSignIn.sharedInstance disconnectWithCallback:^(NSError * _Nullable error) {
+    // В GoogleSignIn 9.0.0 метод disconnect остался без изменений
+    [GIDSignIn.sharedInstance disconnectWithCompletion:^(NSError * _Nullable error) {
         if(error == nil) {
             CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"disconnected"];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -125,23 +151,10 @@
 }
 
 - (void) isSignedIn:(CDVInvokedUrlCommand*)command {
-    bool isSignedIn = [GIDSignIn.sharedInstance currentUser] != nil;
+    // В GoogleSignIn 9.0.0 проверка осталась той же
+    bool isSignedIn = (GIDSignIn.sharedInstance.currentUser != nil);
     CDVPluginResult * pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isSignedIn];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
-#pragma mark - GIDSignInDelegate
-- (void)signIn:(GIDSignIn *)signIn didSignInForUser:(GIDGoogleUser *)user withError:(NSError *)error {
-
-}
-
-- (void)signIn:(GIDSignIn *)signIn presentViewController:(UIViewController *)viewController {
-    self.isSigningIn = YES;
-    [self.viewController presentViewController:viewController animated:YES completion:nil];
-}
-
-- (void)signIn:(GIDSignIn *)signIn dismissViewController:(UIViewController *)viewController {
-    [self.viewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

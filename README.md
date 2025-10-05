@@ -77,9 +77,8 @@ Ensure you have added your url address (example: `http://localhost:3000`) to **A
 See [this screenshot for example](http://pix.toile-libre.org/upload/original/1508064473.png)
 
 ### iOS
-To get your iOS `REVERSED_CLIENT_ID`, [generate a configuration file here](https://developers.google.com/mobile/add?platform=ios&cntapi=signin).
-This `GoogleService-Info.plist` file contains the `REVERSED_CLIENT_ID` you'll need during installation. _This value is only needed for iOS._
-
+This plugin has minimal support version for GoogleSingIn pod package 7.1.0, since that time you have to provide two additional variables 'REVERSED_CLIENT_ID' AND 'CLIENT_ID'.
+Both you could find in google play console.
 The `REVERSED_CLIENT_ID` is also known as the "iOS URL Scheme" on the Developer's Console.
 
 Login on iOS takes the user to a [SafariViewController](https://developer.apple.com/library/ios/documentation/SafariServices/Reference/SFSafariViewController_Ref/) through the Google SDK, instead of the separate Safari browser.
@@ -135,13 +134,13 @@ EXTRA VARIABLES:
 If you need to install a specific version of `GoogleSignIn` library using pod you can pass it as a variable.
 This is optional, if this variable is not set the default version will be used.
 ```
---variable GOOGLE_SIGN_IN_VERSION="~> 6.2.3"
+--variable GOOGLE_SIGN_IN_VERSION="~> 9.0.0"
 ```
 
 If you need to install a specific version of `GoogleUtilities` library using pod you can pass it as a variable.
 This is optional, if this variable is not set the default version will be used.
 ```
---variable GOOGLE_UTILITIES_VERSION="~> 7.4"
+--variable GOOGLE_UTILITIES_VERSION="~> 8.1"
 ```
 
 IMPORTANT:

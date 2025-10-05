@@ -66,6 +66,7 @@
     <source-file src="src/ios/GooglePlus.m"/>
 
     <preference name="REVERSED_CLIENT_ID" />
+    <preference name="CLIENT_ID" />
 
     <config-file target="*-Info.plist" parent="CFBundleURLTypes">
       <array>
@@ -81,6 +82,9 @@
         </dict>
       </array>
     </config-file>
+    <edit-config file="*-Info.plist" mode="merge" target="GIDClientID">
+      <string>$CLIENT_ID</string>
+    </edit-config>
 
     <config-file parent="keychain-access-groups" target="*/Entitlements-Debug.plist">
       <array>
@@ -103,8 +107,8 @@
     <framework src="libz.dylib" weak="true" />
 
     <!-- Google frameworks -->
-    <preference name="GOOGLE_SIGN_IN_VERSION" default="~> 6.2.3"/>
-    <preference name="GOOGLE_UTILITIES_VERSION" default="~> 7.4"/>
+    <preference name="GOOGLE_SIGN_IN_VERSION" default="9.0.0"/>
+    <preference name="GOOGLE_UTILITIES_VERSION" default="~> 8.1"/>
     <podspec>
       <config>
         <source url="https://cdn.cocoapods.org/"/>
