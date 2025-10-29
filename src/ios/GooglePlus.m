@@ -58,6 +58,9 @@
     GIDSignIn *signIn = GIDSignIn.sharedInstance;
     self.isSigningIn = YES;
 
+    // Важно: Конфигурация должна быть установлена перед вызовом signIn
+    signIn.configuration = config;
+
     // В GoogleSignIn 9.0.0 изменилась сигнатура метода signIn
     // Теперь используется signInWithPresentingViewController:completion:
     [signIn signInWithPresentingViewController:self.viewController
@@ -102,9 +105,6 @@
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self->_callbackId];
         }
     }];
-
-    // Важно: Конфигурация должна быть установлена перед вызовом signIn
-    signIn.configuration = config;
 }
 
 - (NSString*) reverseUrlScheme:(NSString*)scheme {
