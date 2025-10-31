@@ -1,5 +1,9 @@
 # Google Sign-In Cordova/PhoneGap Plugin
 
+## ⚠️⚠️⚠️ About this fork ⚠️⚠️⚠️
+
+This fork softens some breaking changes introduced in [this PR](https://github.com/EddyVerbruggen/cordova-plugin-googleplus/pull/764). When the mentioned PR is reviewed and finally merged (or when an alternative solution is developed), consider migrating back to the [original plugin by Eddy Verbruggen](https://github.com/EddyVerbruggen/cordova-plugin-googleplus).
+
 [![NPM version][npm-image]][npm-url]
 [![Downloads][downloads-image]][npm-url]
 [![Twitter Follow][twitter-image]][twitter-url]
@@ -73,9 +77,15 @@ Ensure you have added your url address (example: `http://localhost:3000`) to **A
 See [this screenshot for example](http://pix.toile-libre.org/upload/original/1508064473.png)
 
 ### iOS
-To get your iOS `REVERSED_CLIENT_ID`, [generate a configuration file here](https://developers.google.com/mobile/add?platform=ios&cntapi=signin).
-This `GoogleService-Info.plist` file contains the `REVERSED_CLIENT_ID` you'll need during installation. _This value is only needed for iOS._
+This plugin has minimal support version for GoogleSingIn pod package 7.1.0, since that time you have to provide two additional variables 'REVERSED_CLIENT_ID' AND 'GIDClientID'.
+Both you could find in google play console.
 
+To add `GIDClientID` add configuration edition to main `config.xml` file:
+```
+<edit-config file="*-Info.plist" mode="merge" target="GIDClientID">
+  <string>yourclientid</string>
+</edit-config>
+```
 The `REVERSED_CLIENT_ID` is also known as the "iOS URL Scheme" on the Developer's Console.
 
 Login on iOS takes the user to a [SafariViewController](https://developer.apple.com/library/ios/documentation/SafariServices/Reference/SFSafariViewController_Ref/) through the Google SDK, instead of the separate Safari browser.
@@ -124,6 +134,20 @@ Using the Cordova CLI to fetch the latest version from GitHub:
 ```
 $ cordova plugin add https://github.com/EddyVerbruggen/cordova-plugin-googleplus --save --variable REVERSED_CLIENT_ID=myreversedclientid  --variable WEB_APPLICATION_CLIENT_ID=mywebapplicationclientid
 $ cordova prepare
+```
+
+EXTRA VARIABLES:
+
+If you need to install a specific version of `GoogleSignIn` library using pod you can pass it as a variable.
+This is optional, if this variable is not set the default version will be used.
+```
+--variable GOOGLE_SIGN_IN_VERSION="~> 9.0.0"
+```
+
+If you need to install a specific version of `GoogleUtilities` library using pod you can pass it as a variable.
+This is optional, if this variable is not set the default version will be used.
+```
+--variable GOOGLE_UTILITIES_VERSION="~> 8.1"
 ```
 
 IMPORTANT:
@@ -183,12 +207,9 @@ document.addEventListener('deviceready', deviceReady, false);
 function deviceReady() {
     //I get called when everything's ready for the plugin to be called!
     console.log('Device is ready!');
-    window.plugins.googleplus.trySilentLogin(...);
+    window.plugins.googleplus.login(...);
 }
 ```
-
-### isAvailable
-3/31/16: This method is no longer required to be checked first. It is kept for code orthoganality.
 
 ### Login
 
@@ -237,31 +258,6 @@ Additional user information is available by use case. Add the scopes needed to t
 On Android, the error callback (third argument) receives an error status code if authentication was not successful. A description of those status codes can be found on Google's android developer website at [GoogleSignInStatusCodes](https://developers.google.com/android/reference/com/google/android/gms/auth/api/signin/GoogleSignInStatusCodes).
 
 On iOS, the error callback will include an [NSError localizedDescription](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSError_Class/).
-
-### Try silent login
-You can call `trySilentLogin` to check if they're already signed in to the app and sign them in silently if they are.
-
-If it succeeds you will get the same object as the `login` function gets,
-but if it fails it will not show the authentication dialog to the user.
-
-Calling `trySilentLogin` is done the same as `login`, except for the function name.
-```javascript
-window.plugins.googleplus.trySilentLogin(
-    {
-      'scopes': '... ', // optional - space-separated list of scopes, If not included or empty, defaults to `profile` and `email`.
-      'webClientId': 'client id of the web app/server side', // optional - clientId of your Web application from Credentials settings of your project - On Android, this MUST be included to get an idToken. On iOS, it is not required.
-      'offline': true, // Optional, but requires the webClientId - if set to true the plugin will also return a serverAuthCode, which can be used to grant offline access to a non-Google server
-    },
-    function (obj) {
-      alert(JSON.stringify(obj)); // do something useful instead of alerting
-    },
-    function (msg) {
-      alert('error: ' + msg);
-    }
-);
-```
-
-It is strongly recommended that trySilentLogin is implemented with the same options as login, to avoid any potential complications.
 
 ### logout
 This will clear the OAuth2 token.
